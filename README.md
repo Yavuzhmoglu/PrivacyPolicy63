@@ -1,5 +1,5 @@
-# PrivacyPolicy63
-Stickers
+# PrivacyPolicy
+
 
 **Terms & Conditions**
 
