@@ -38,3 +38,114 @@ These terms and conditions are effective as of 2022-02-18
 **Contact Us**
 
 If you have any questions or suggestions about my Terms and Conditions, do not hesitate to contact me at justtouchinfo@gmail.com.
+
+
+
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Windows.Forms;
+using Zuby.ADGV;
+
+namespace Veri
+{
+    public partial class Form1 : Form
+    {
+        
+        private string connectionString = "Data Source=DESKTOP-OPQQL1L\\SQLEXPRESS;Initial Catalog=DenemeExcelVT;Integrated Security=True";
+        private SqlDataAdapter dataAdapter;
+        private DataTable dataTable;
+//        private Zuby.ADGV.AdvancedDataGridView advancedDataGridView;
+
+        public Form1()
+        {
+            InitializeComponent();
+
+            // AdvancedDataGridView kontrolünü oluştur
+           // advancedDataGridView1 = new Zuby.ADGV.AdvancedDataGridView();
+            advancedDataGridView1.Dock = DockStyle.Fill;
+
+            // Forma AdvancedDataGridView kontrolünü ekle
+            Controls.Add(advancedDataGridView1);
+
+            advancedDataGridView1.ColumnHeadersVisible = true;
+
+
+            advancedDataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.LightBlue;
+            advancedDataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.DarkBlue;
+            advancedDataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
+            advancedDataGridView1.DefaultCellStyle.SelectionBackColor = Color.DarkOrange;
+            advancedDataGridView1.DefaultCellStyle.SelectionForeColor = Color.White;
+            //advancedDataGridView1.RowHeadersVisible = true;
+            //advancedDataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            //advancedDataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            //advancedDataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            //advancedDataGridView1.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            //advancedDataGridView1.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            //advancedDataGridView1.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+
+
+
+
+
+
+        }
+
+        private void VeriCekmeForm_Load(object sender, EventArgs e)
+        {
+            // Form yüklendiğinde veriyi çek ve AdvancedDataGridView kontrolüne ekle
+            VeriyiCekVeGoster();
+
+            RenklendirSutun(0, Color.Yellow);
+        }
+
+        private void VeriyiCekVeGoster()
+        {
+            try
+            {
+                // Veritabanından veriyi çek
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT * FROM KayitExcel";
+                    dataAdapter = new SqlDataAdapter(query, connection);
+                    SqlCommandBuilder commandBuilder = new SqlCommandBuilder(dataAdapter);
+
+                    dataTable = new DataTable();
+                    dataAdapter.Fill(dataTable);
+
+                    // AdvancedDataGridView'e veriyi bağla
+                    advancedDataGridView1.DataSource = dataTable;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Veri çekme hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void RenklendirSutun(int columnIndex, Color color)
+        {
+            if (columnIndex >= 0 && columnIndex < advancedDataGridView1.Columns.Count)
+            {
+                // Belirli bir sütunu renklendir
+                advancedDataGridView1.Columns[columnIndex].DefaultCellStyle.BackColor = color;
+            }
+        }
+
+        private void AdvancedDataGridView_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            // Sadece başlık satırını renklendir
+            if (e.RowIndex == -1)
+            {
+                advancedDataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightBlue;
+                advancedDataGridView1.Rows[e.RowIndex].DefaultCellStyle.ForeColor = Color.DarkBlue;
+            }
+        }
+    }
+}
