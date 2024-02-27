@@ -149,3 +149,74 @@ namespace Veri
         }
     }
 }
+
+
+
+
+
+---
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace ExcelFileProcessor.UserControls
+{
+    public partial class UlkelerAgaciUserControl : UserControl
+    {
+        private string connectionString = "Data Source=DESKTOP-OPQQL1L\\SQLEXPRESS;Initial Catalog=DenemeExcelVT;Integrated Security=True";
+
+        public UlkelerAgaciUserControl()
+        {
+            InitializeComponent();
+            UlkeleriGetir();
+        }
+
+        private void UlkeleriGetir()
+        {
+            treeViewUlkeler.Nodes.Clear();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string selectQuery = "SELECT Id, CountryCode FROM Country";
+                SqlCommand command = new SqlCommand(selectQuery, connection);
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    int ulkeId = Convert.ToInt32(reader["Id"]);
+                    string ulkeKodu = reader["CountryCode"].ToString();
+
+                    TreeNode ulkeNode = new TreeNode(ulkeKodu);
+                    ulkeNode.Tag = ulkeId;
+
+                    // Ülkenin altındaki verileri eklemek için gerekli sorguları buraya ekleyebilirsiniz.
+                    // Örneğin: altındaki şehirleri çekmek için bir sorgu yapabilir ve şehirleri ulkeNode'un altına ekleyebilirsiniz.
+
+                    treeViewUlkeler.Nodes.Add(ulkeNode);
+                }
+
+                reader.Close();
+            }
+        }
+
+        private void treeViewUlkeler_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            // Ağaçtaki bir düğüme tıklandığında burada gerekli işlemleri yapabilirsiniz.
+            // Örneğin, seçilen ülkenin altındaki verileri göstermek için gerekli sorguları yapabilirsiniz.
+            // Bu kısmı projenizin gereksinimlerine göre özelleştirebilirsiniz.
+            int ulkeId = (int)e.Node.Tag;
+            VerileriGoster(ulkeId);
+        }
+
+        private void VerileriGoster(int ulkeId)
+        {
+            // Bu kısma, seçilen ülkenin altındaki verileri göstermek için gerekli sorguları ve kodları ekleyebilirsiniz.
+            // Örneğin, seçilen ülkenin şehirlerini göstermek için bir sorgu yapabilir ve sonucu bir DataGridView'e bağlayabilirsiniz.
+            // Bu kısmı projenizin gereksinimlerine göre özelleştirebilirsiniz.
+        }
+    }
+}
+
