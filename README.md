@@ -314,3 +314,44 @@ namespace GroupByColumnsApp
     }
 }
 
+
+
+using System;
+using System.Data.SqlClient;
+
+class Program
+{
+    static void Main()
+    {
+        // Veritabanı bağlantı dizesini belirtin
+        string connectionString = "";
+
+        // SQL sorgusu
+        string sqlQuery = "SELECT COUNT(Column1) AS Column1Count FROM YourTable";
+
+        // SqlConnection oluştur
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            // SqlCommand oluştur
+            using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+            {
+                try
+                {
+                    // Bağlantıyı aç
+                    connection.Open();
+
+                    // Sorguyu çalıştır ve sonucu al
+                    int count = (int)command.ExecuteScalar();
+
+                    // Sonucu ekrana yazdır
+                    Console.WriteLine($"Column1'deki değerlerin sayısı: {count}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Hata: {ex.Message}");
+                }
+            }
+        }
+    }
+}
+
