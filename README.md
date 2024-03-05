@@ -220,3 +220,97 @@ namespace ExcelFileProcessor.UserControls
     }
 }
 
+
+
+
+veri  gruplama 
+
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace GroupByColumnsApp
+{
+    public partial class MainForm : Form
+    {
+        private const string connectionString = ""; // Veritabanı bağlantı dizesini ayarlayın
+
+        public MainForm()
+        {
+            InitializeComponent();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Tüm kolonları çeken sorgu
+                    string sqlQuery = "SELECT * FROM YourTable";
+                    SqlDataAdapter adapter = new SqlDataAdapter(sqlQuery, connection);
+
+                    // Veri tablosunu doldur
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+
+                    // Kolonları grupla ve DataGridView'e ekle
+                    var groupedData = GroupByColumns(dataTable);
+                    dataGridView1.DataSource = groupedData;
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Hata: {ex.Message}");
+                }
+            }
+        }
+
+        private DataTable GroupByColumns(DataTable originalTable)
+        {
+            // Tüm kolonlardaki değerleri birleştirip gruplamak için bir sütun ekleyin
+            originalTable.Columns.Add("GroupByColumn", typeof(string));
+
+            foreach (DataRow row in originalTable.Rows)
+            {
+                string concatenatedValues = "";
+                foreach (DataColumn column in originalTable.Columns)
+                {
+                    concatenatedValues += row[column].ToString();
+                }
+                row["GroupByColumn"] = concatenatedValues;
+            }
+
+            // Yeni bir DataTable oluşturun ve gruplanmış verileri ekleyin
+            DataTable groupedTable = new DataTable();
+            groupedTable.Columns.Add("GroupByColumn", typeof(string));
+            groupedTable.Columns.Add("Count", typeof(int));
+
+            var groupedRows = originalTable.AsEnumerable()
+                .GroupBy(r => r.Field<string>("GroupByColumn"))
+                .Select(g => new
+                {
+                    GroupByColumn = g.Key,
+                    Count = g.Count()
+                });
+
+            foreach (var group in groupedRows)
+            {
+                groupedTable.Rows.Add(group.GroupByColumn, group.Count);
+            }
+
+            return groupedTable;
+        }
+    }
+}
+
